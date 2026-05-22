@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 text-center">
+        <h1 class="display-5 mb-3">Market Price Estimator</h1>
+        <p class="lead text-muted mb-5">Оценка рыночной стоимости автомобильных шин и дисков на основе данных с Ozon</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <a href="/parse" class="text-decoration-none">
+                    <div class="card h-100 border-primary hover-shadow">
+                        <div class="card-body text-center py-5">
+                            <div class="display-3 mb-3">🔍</div>
+                            <h4>Парсинг</h4>
+                            <p class="text-muted">Спарсить цены товаров с Ozon и сохранить в базу</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/estimate" class="text-decoration-none">
+                    <div class="card h-100 border-success hover-shadow">
+                        <div class="card-body text-center py-5">
+                            <div class="display-3 mb-3">💰</div>
+                            <h4>Оценка цены</h4>
+                            <p class="text-muted">Рассчитать рекомендованную рыночную цену</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/parsed" class="text-decoration-none">
+                    <div class="card h-100 border-info hover-shadow">
+                        <div class="card-body text-center py-5">
+                            <div class="display-3 mb-3">📦</div>
+                            <h4>Товары</h4>
+                            <p class="text-muted">Управление спаршенными товарами</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-2 justify-content-center">
+            <div class="col-md-4">
+                <a href="/estimates" class="text-decoration-none">
+                    <div class="card h-100 border-warning hover-shadow">
+                        <div class="card-body text-center py-5">
+                            <div class="display-3 mb-3">📊</div>
+                            <h4>История оценок</h4>
+                            <p class="text-muted">Просмотр всех ранее рассчитанных цен</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/analysis" class="text-decoration-none">
+                    <div class="card h-100 border-danger hover-shadow">
+                        <div class="card-body text-center py-5">
+                            <div class="display-3 mb-3">📈</div>
+                            <h4>Анализ</h4>
+                            <p class="text-muted">Корреляционно-регрессионный анализ цен</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

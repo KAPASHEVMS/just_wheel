@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">Парсинг товаров с Ozon</h1>
+
+        <form action="/parse" method="post" id="parseForm">
+            <div class="mb-3">
+                <label class="form-label">Категория товара</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="category" id="catTire" value="Tire" checked onchange="toggleFields()" />
+                        <label class="form-check-label" for="catTire">Шины</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="category" id="catWheel" value="Wheel" onchange="toggleFields()" />
+                        <label class="form-check-label" for="catWheel">Диски</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Бренд</label>
+                <input class="form-control" name="brand" required placeholder="Например, KAMA, Sailun, Pirelli..." value="{{ brand or '' }}" />
+            </div>
+
+            <div id="tireFields">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Ширина (мм)</label>
+                        <input class="form-control" name="width" type="number" placeholder="185" value="{{ width or '' }}" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Профиль (%)</label>
+                        <input class="form-control" name="profile" type="number" placeholder="65" value="{{ profile or '' }}" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Радиус (R)</label>
+                        <select class="form-select" name="radius">
+                            <option value="">— выберите —</option>
+                            {% for r in [13,14,15,16,17,18,19,20,21,22] %}
+                            <option value="{{ r }}" {% if radius == r|string %}selected{% endif %}>R{{ r }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="wheelFields" style="display:none">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Радиус (R)</label>
+                        <select class="form-select" name="wheel_radius">
+                            <option value="">— выберите —</option>
+                            {% for r in [13,14,15,16,17,18,19,20,21,22] %}
+                            <option value="{{ r }}" {% if wheel_radius == r|string %}selected{% endif %}>R{{ r }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Спарсить</button>
+        </form>
+
+        {% if search_query %}
+        <div class="alert alert-info mt-3">
+            Поисковый запрос: <strong>{{ search_query }}</strong>
+        </div>
+        {% endif %}
+
+        {% if prices %}
+        {% if replaced %}
+        <div class="alert alert-warning mt-3">
+            ⚠️ Для запроса «{{ search_query }}» старые данные заменены новыми ({{ prices|length }} товаров).
+        </div>
+        {% else %}
+        <div class="alert alert-success mt-3">
+            Спаршено {{ prices|length }} товаров
+        </div>
+        {% endif %}
+        <table class="table table-striped">
+            <thead><tr><th>Название</th><th>Цена</th><th>Ссылка</th></tr></thead>
+            <tbody>
+                {% for p in prices %}
+                <tr>
+                    <td>{{ p.title[:120] }}</td>
+                    <td>{{ p.price }} RUB</td>
+                    <td><a href="{{ p.url }}" target="_blank">Ozon</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/estimate?q={{ search_query }}" class="btn btn-success">Рассчитать рекомендованную цену</a>
+        {% endif %}
+
+        {% if history %}
+        <h3 class="mt-5">Ранее спаршенные товары</h3>
+        {% for query, items in history.items() %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>{{ query }}</strong>
+                <span class="badge bg-secondary ms-2">{{ items|length }} товаров</span>
+                <a href="/estimate?q={{ query }}" class="btn btn-sm btn-outline-success float-end">Рассчитать цену</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Название</th><th>Цена</th><th>Ссылка</th></tr></thead>
+                    <tbody>
+                        {% for p in items %}
+                        <tr>
+                            <td>{{ p.title[:80] }}</td>
+                            <td>{{ p.price }} RUB</td>
+                            <td><a href="{{ p.url }}" target="_blank">Ozon</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleFields() {
+    const isWheel = document.getElementById('catWheel').checked;
+    document.getElementById('tireFields').style.display = isWheel ? 'none' : 'block';
+    document.getElementById('wheelFields').style.display = isWheel ? 'block' : 'none';
+}
+toggleFields();
+</script>
+{% endblock %}

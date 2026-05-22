@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1 class="mb-4">Расчет рыночной цены</h1>
+        <p>Введите запрос или выберите из предложенных вариантов.</p>
+
+        <form action="/estimate" method="post" id="estimateForm">
+            <div class="mb-3 position-relative">
+                <label class="form-label">Поисковый запрос</label>
+                <input class="form-control" id="queryInput" name="search_query"
+                       autocomplete="off" placeholder="Начните вводить запрос..."
+                       value="{{ search_query or '' }}" />
+                <div id="suggestions" class="list-group position-absolute w-100" style="z-index:1000; display:none"></div>
+                <div id="notFound" class="text-danger mt-1 small" style="display:none">⚠️ Запрос не найден в базе. Сначала <a href="/parse">спарсите товар</a>.</div>
+                <input type="hidden" id="queryValid" value="0" />
+            </div>
+            <button type="submit" class="btn btn-primary">Рассчитать цену</button>
+        </form>
+    </div>
+</div>
+
+<script>
+let debounceTimer = null;
+const input = document.getElementById('queryInput');
+const list = document.getElementById('suggestions');
+const notFound = document.getElementById('notFound');
+const valid = document.getElementById('queryValid');
+
+input.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    const val = this.value.trim();
+    if (val.length < 2) {
+        list.style.display = 'none';
+        notFound.style.display = 'none';
+        valid.value = '0';
+        return;
+    }
+    debounceTimer = setTimeout(() => fetchSuggestions(val), 300);
+});
+
+function fetchSuggestions(q) {
+    fetch('/api/queries?q=' + encodeURIComponent(q))
+        .then(r => r.json())
+        .then(data => {
+            list.innerHTML = '';
+            if (data.length > 0) {
+                data.forEach(item => {
+                    const a = document.createElement('a');
+                    a.className = 'list-group-item list-group-item-action py-2';
+                    a.textContent = item;
+                    a.href = 'javascript:void(0)';
+                    // mousedown срабатывает ДО blur, поэтому список не успеет скрыться
+                    a.addEventListener('mousedown', function(e) {
+                        e.preventDefault();
+                        input.value = item;
+                        list.style.display = 'none';
+                        notFound.style.display = 'none';
+                        valid.value = '1';
+                    });
+                    list.appendChild(a);
+                });
+                list.style.display = 'block';
+                notFound.style.display = 'none';
+                valid.value = '0';
+            } else {
+                list.style.display = 'none';
+                notFound.style.display = 'block';
+                valid.value = '0';
+            }
+        });
+}
+
+input.addEventListener('blur', function() {
+    setTimeout(() => { list.style.display = 'none'; }, 200);
+});
+
+input.addEventListener('focus', function() {
+    if (list.children.length > 0) {
+        list.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

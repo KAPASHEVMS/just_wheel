@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">Результат оценки</h1>
+
+        {% if existing %}
+        <div class="alert alert-warning">
+            <strong>⚠️ Внимание!</strong> Для запроса «{{ search_query }}» уже была рассчитана цена:
+            <strong>{{ existing.recommended_price }} ₽</strong> ({{ existing.created_at }}).
+            Текущий расчёт показывает новую цену на основе актуальных данных.
+            При сохранении старая запись будет заменена.
+        </div>
+        {% endif %}
+
+        <div class="alert alert-success">
+            <h4>Рекомендуемая цена: <strong>{{ recommended }} ₽</strong></h4>
+            <p class="mb-0">Запрос: «{{ search_query }}»</p>
+        </div>
+
+        <h3 class="mt-4">Цены конкурентов ({{ competitor_prices|length }})</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Конкурент</th>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Ссылка</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in competitor_prices %}
+                <tr>
+                    <td>{{ item.competitor }}</td>
+                    <td>{{ item.title[:100] }}</td>
+                    <td>{{ item.price }} ₽</td>
+                    <td><a href="{{ item.url }}" target="_blank">Перейти</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="mt-3">
+            <form action="/save-estimate" method="post" style="display:inline">
+                <input type="hidden" name="search_query" value="{{ search_query }}" />
+                <input type="hidden" name="category" value="{{ category }}" />
+                <input type="hidden" name="type" value="{{ type }}" />
+                <input type="hidden" name="recommended" value="{{ recommended }}" />
+                <input type="hidden" name="items_count" value="{{ competitor_prices|length }}" />
+                <button type="submit" class="btn btn-success">💾 Сохранить оценку</button>
+            </form>
+            <a class="btn btn-secondary" href="/parse">← К парсингу</a>
+            <a class="btn btn-outline-primary" href="/estimate">Другой запрос</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

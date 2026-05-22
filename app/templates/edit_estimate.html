@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1 class="mb-3">Редактировать оценку #{{ item.id }}</h1>
+        <form action="/edit-estimate/{{ item.id }}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Поисковый запрос</label>
+                <input class="form-control" name="search_query" value="{{ item.search_query }}" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Рекомендуемая цена</label>
+                <input class="form-control" name="recommended_price" type="number" step="0.01" value="{{ item.recommended_price }}" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Категория</label>
+                <select class="form-select" name="category">
+                    <option value="Tire" {% if item.category == "Tire" %}selected{% endif %}>Шины</option>
+                    <option value="Wheel" {% if item.category == "Wheel" %}selected{% endif %}>Диски</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Тип</label>
+                <select class="form-select" name="type">
+                    <option value="Summer" {% if item.type == "Summer" %}selected{% endif %}>Летняя</option>
+                    <option value="Winter" {% if item.type == "Winter" %}selected{% endif %}>Зимняя</option>
+                    <option value="All-season" {% if item.type == "All-season" %}selected{% endif %}>Всесезонная</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="/estimates" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
